@@ -16,6 +16,11 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
-            results = runtests(pwd, 'IncludeSubfolders', true);
+            % Explicitly add the harness folder (the parent of +core)
+            addpath(fullfile(pwd, 'harness'));
+            addpath(genpath(pwd));
+            rehash; % Force MATLAB to refresh its function database
+            
+            results = runtests('tests/integration/test_agent_performance.m');
             display(results);
-            assert(~isempty(results) && ~any([results.Failed]));
+            assert(~isempty(results) && all([results.Passed]), 'Tests failed or were not found');

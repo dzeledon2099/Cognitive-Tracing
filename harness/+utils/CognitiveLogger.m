@@ -1,33 +1,15 @@
 classdef CognitiveLogger < handle
     properties
-        Trace % Stores the 'Cognitive Trajectory'
+        Trace = struct('Step', {}, 'Divergence', {}, 'Reasoning', {})
     end
-    
     methods
-        function logDivergence(obj, step, predictedState, actualState, reasoning)
-            % Breakthrough Metric: The 'Reasoning Error'
-            % E = ||S_pred - S_actual||
-            errorVal = norm(predictedState - actualState);
-            
-            entry = struct(...
-                'Step', step, ...
-                'Reasoning', reasoning, ...
-                'Divergence', errorVal, ...
-                'Timestamp', datetime('now')...
-            );
+        function logDivergence(obj, step, pred, actual, reasoning)
+            err = norm(pred - actual);
+            entry = struct('Step', step, 'Divergence', err, 'Reasoning', reasoning);
             obj.Trace(end+1) = entry;
-            
-            % Ensure logs directory exists
-            if ~exist('logs', 'dir')
-                mkdir('logs');
-            end
-            
-            % Save as JSON for Jules to analyze
-            fid = fopen('logs/divergence_trace.json', 'w');
-            if fid ~= -1
-                fprintf(fid, jsonencode(obj.Trace, 'PrettyPrint', true));
-                fclose(fid);
-            end
+            % Pre-create logs dir if it doesn't exist
+            if ~exist('logs', 'dir'), mkdir('logs'); end
+            save('logs/last_trace.mat', 'entry');
         end
     end
 end
