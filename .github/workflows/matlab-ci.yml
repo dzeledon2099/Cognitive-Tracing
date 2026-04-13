@@ -17,12 +17,20 @@ jobs:
         with:
           command: |
             try
-                addpath(genpath('harness')); 
-                addpath(genpath('tests'));
-                results = runtests(pwd, 'IncludeSubfolders', true);
+                % Force refresh path to include the root and all subfolders
+                addpath(genpath(pwd));
+                savepath; 
+                
+                % Run tests and output detailed results
+                suite = testsuite('tests');
+                results = run(suite);
+                
                 display(results);
-                assert(~isempty(results) && ~any([results.Failed]));
+                if isempty(results) || any([results.Failed])
+                    exit(1);
+                end
             catch ME
+                fprintf('Error: %s\n', ME.message);
                 disp(ME.getReport);
                 exit(1);
             end
