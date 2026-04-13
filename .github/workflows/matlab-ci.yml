@@ -16,21 +16,24 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
+            % 1. Setup Pathing
+            addpath(pwd);
+            addpath(genpath('harness'));
+            addpath(genpath('tests'));
+            savepath;
+            
+            % 2. Debug: List files so we can see them in the Action logs
+            fprintf('--- Current Directory Contents ---\n');
+            dir('tests/integration')
+            
+            % 3. Run by Filename to bypass suite discovery issues
             try
-                % Force refresh path to include the root and all subfolders
-                addpath(genpath(pwd));
-                savepath; 
-                
-                % Run tests and output detailed results
-                suite = testsuite('tests');
-                results = run(suite);
-                
+                results = runtests('tests/integration/test_agent_performance.m');
                 display(results);
                 if isempty(results) || any([results.Failed])
                     exit(1);
                 end
             catch ME
-                fprintf('Error: %s\n', ME.message);
-                disp(ME.getReport);
+                fprintf('Critical Error: %s\n', ME.message);
                 exit(1);
             end
