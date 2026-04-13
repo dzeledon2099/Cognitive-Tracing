@@ -7,9 +7,14 @@ classdef CognitiveLogger < handle
             err = norm(pred - actual);
             entry = struct('Step', step, 'Divergence', err, 'Reasoning', reasoning);
             obj.Trace(end+1) = entry;
-            % Pre-create logs dir if it doesn't exist
-            if ~exist('logs', 'dir'), mkdir('logs'); end
-            save('logs/last_trace.mat', 'entry');
+            
+            % Pro Fix: Ensure the directory exists before saving
+            logDir = 'logs';
+            if ~exist(logDir, 'dir')
+                mkdir(logDir);
+            end
+            
+            save(fullfile(logDir, 'last_trace.mat'), 'entry');
         end
     end
 end
