@@ -1,9 +1,16 @@
 classdef test_agent_performance < matlab.unittest.TestCase
+    methods (TestClassSetup)
+        function addHarnessToPath(testCase)
+            % This forces MATLAB to see the 'harness' folder as a package root
+            import matlab.unittest.fixtures.PathFixture;
+            harnessPath = fullfile(pwd, 'harness');
+            testCase.applyFixture(PathFixture(harnessPath));
+        end
+    end
+
     methods (Test)
         function testDivergenceLogging(testCase)
-            % Setup pathing internally to be safe
-            addpath(genpath(fullfile(pwd, 'harness')));
-            
+            % Verify we can now see the classes
             env = core.Environment();
             logger = utils.CognitiveLogger();
             

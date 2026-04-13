@@ -15,8 +15,4 @@ jobs:
       - name: Run Agent Tests
         uses: matlab-actions/run-command@v2
         with:
-          command: |
-            addpath(genpath(pwd));
-            results = runtests('test_agent_performance');
-            display(results);
-            assert(~isempty(results) && ~any([results.Failed]));
+          command: results = runtests('tests/integration/test_agent_performance.m'); assert(~isempty(results) && ~any([results.Failed]));
